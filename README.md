@@ -27,7 +27,7 @@ andere microbit ook op afstand worden afgespeeld. De MakeCode-extensie
 volume mee instellen, het tempo aanpassen, instrumenten kiezen en de
 audioclip transponeren. Dit is tijdens het afspelen mogelijk. Door de
 **pxt-midi**-extensie met andere extensies te combineren kun je
-bijvoorbeeld de muziek op beweging laten reageren of robot-bewegingen
+bovendien de muziek op beweging laten reageren of robot-bewegingen
 met de muziek synchroniseren.
 
 ## Interactie met de audioclip
