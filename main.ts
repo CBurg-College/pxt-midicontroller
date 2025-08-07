@@ -173,15 +173,17 @@ namespace CMidiController {
             MIDIPLAY = true
         }
         else {
-            tm_pause = control.millis()
-            MIDIPLAY = false
-            basic.showLeds(`
-                        # # . # #
-                        # # . # #
-                        # # . # #
-                        # # . # #
-                        # # . # #
-                        `)
+            if (MIDIPLAY) {
+                tm_pause = control.millis()
+                MIDIPLAY = false
+                basic.showLeds(`
+                            # # . # #
+                            # # . # #
+                            # # . # #
+                            # # . # #
+                            # # . # #
+                            `)
+            }
         }
     }
 
