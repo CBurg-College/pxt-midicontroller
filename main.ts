@@ -80,10 +80,11 @@ basic.forever(function () {
     if (!MIDIPLAY) return
 
     if (MIDIRESTART) {
+        MIDIRESTART = false
         part = -1
         tone = 0
+        tm_pause = 0
         tm_start = control.millis()
-        MIDIRESTART = false
     }
 
     tm = control.millis();
@@ -152,13 +153,26 @@ namespace CMidiController {
                         . # # # .
                         . # # . .
                         `)
+        tm_pause = 0
         MIDINOTE = 0
         MIDIPLAY = true
         MIDIRESTART = true
     }
 
-    export function pause(status: boolean) {
-        if (status) {
+    export function pause() {
+        if (tm_pause) {
+            basic.showLeds(`
+                        . # # . .
+                        . # # # .
+                        . # # # #
+                        . # # # .
+                        . # # . .
+                        `)
+            tm_start += control.millis() - tm_pause
+            tm_pause = 0;
+            MIDIPLAY = true
+        }
+        else {
             tm_pause = control.millis()
             MIDIPLAY = false
             basic.showLeds(`
@@ -169,17 +183,6 @@ namespace CMidiController {
                         # # . # #
                         `)
         }
-        else {
-            basic.showLeds(`
-                        . # # . .
-                        . # # # .
-                        . # # # #
-                        . # # # .
-                        . # # . .
-                        `)
-            tm_start += control.millis() - tm_pause
-            MIDIPLAY = true
-        }
     }
 
     export function repeat(status: boolean) {
@@ -187,6 +190,7 @@ namespace CMidiController {
     }
 
     export function stop() {
+        tm_pause = 0
         MIDIPLAY = false
         basic.showLeds(`
                         . . . . .
@@ -247,7 +251,9 @@ input.onButtonPressed(Button.B, function () {
 radio.onReceivedNumber(function (cmd: number) {
     // 0: stop playing
     // 1: start playing
-    // 2: pause playing
+    // 2: pause/resume playing
+    // 3: repeat on
+    // 4: repeat off
 
     // 100-500: transposing = value - 300
 
@@ -269,13 +275,11 @@ radio.onReceivedNumber(function (cmd: number) {
     else
     if (cmd == 1) CMidiController.start()
     else
-    if (cmd == 2) CMidiController.pause(true)
+    if (cmd == 2) CMidiController.pause()
     else
-    if (cmd == 3) CMidiController.pause(false)
+    if (cmd == 3) CMidiController.repeat(true)
     else
-    if (cmd == 4) CMidiController.repeat(true)
-    else
-    if (cmd == 5) CMidiController.repeat(false)
+    if (cmd == 4) CMidiController.repeat(false)
     else
 
     if (cmd <= 500) CMidiController.transpose(cmd - 300)
