@@ -131,34 +131,78 @@ basic.forever(function () {
 
             MIDIRESTART = true;
             MIDINOTE = 0
-            if (MIDIREPEAT)
+            if (MIDIREPEAT) {
+                CMidiController.pause(true)
                 basic.pause(500)
+                CMidiController.pause(false)
+            }
             else
-                MIDIPLAY = false
+                CMidiController.stop()
         }
     }
 })
 
 namespace CMidiController {
     export function start() {
+        basic.showLeds(`
+                        . # # . .
+                        . # # # .
+                        . # # # #
+                        . # # # .
+                        . # # . .
+                        `)
         MIDINOTE = 0
         MIDIPLAY = true
         MIDIRESTART = true
     }
 
-    export function pause() {
-        MIDIPLAY = !MIDIPLAY
+    export function pause(status: boolean) {
+        if (status) {
+            MIDIPLAY = false
+            basic.showLeds(`
+                        # # . # #
+                        # # . # #
+                        # # . # #
+                        # # . # #
+                        # # . # #
+                        `)
+        }
+        else {
+            basic.showLeds(`
+                        . # # . .
+                        . # # # .
+                        . # # # #
+                        . # # # .
+                        . # # . .
+                        `)
+            MIDIPLAY = true
+        }
+    }
+
+    export function repeat(status: boolean) {
+        MIDIREPEAT = status
     }
 
     export function stop() {
         MIDIPLAY = false
+        basic.showLeds(`
+                        . . . . .
+                        . # # # .
+                        . # # # .
+                        . # # # .
+                        . . . . .
+                        `)
     }
 
     export function setInstrument(partiture: number, instrument: number) {
+        if (partiture < 1 || partiture > 5) return;
+        if (instrument < -127 || instrument > 127) return
         partinstrument[partiture - 1] = instrument;
     }
 
     export function setVolume(partiture: number, volume: number) {
+        if (partiture < 1 || partiture > 5) return;
+        if (volume > 127) return
         partvolume[partiture - 1] = volume;
     }
 
@@ -218,46 +262,17 @@ radio.onReceivedNumber(function (cmd: number) {
 
     // > 3000: duration = value - 3000
 
-    if (!cmd) {
-        CMidiController.stop()
-        basic.showLeds(`
-                        . . . . .
-                        . # # # .
-                        . # # # .
-                        . # # # .
-                        . . . . .
-                        `)
-    }
+    if (!cmd) CMidiController.stop()
     else
-    if (cmd == 1) {
-        basic.showLeds(`
-                        . # # . .
-                        . # # # .
-                        . # # # #
-                        . # # # .
-                        . # # . .
-                        `)
-        CMidiController.start()
-    }
+    if (cmd == 1) CMidiController.start()
     else
-    if (cmd == 2) {
-        CMidiController.pause()
-        basic.showLeds(`
-                        # # . # #
-                        # # . # #
-                        # # . # #
-                        # # . # #
-                        # # . # #
-                        `)
-    }
+    if (cmd == 2) CMidiController.pause(true)
     else
-    if (cmd == 3) {
-        MIDIREPEAT = true
-    }
+    if (cmd == 3) CMidiController.pause(false)
     else
-    if (cmd == 4) {
-        MIDIREPEAT = false
-    }
+    if (cmd == 4) CMidiController.repeat(true)
+    else
+    if (cmd == 5) CMidiController.repeat(false)
     else
 
     if (cmd <= 500) CMidiController.transpose(cmd - 300)
