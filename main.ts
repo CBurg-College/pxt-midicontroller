@@ -71,7 +71,8 @@ function instrument(instr: number) {
 
 let part = -1
 let tone = 0
-let start = control.millis()
+let tm_start = control.millis()
+let tm_pause = control.millis()
 let tm = control.millis()
 
 basic.forever(function () {
@@ -81,12 +82,12 @@ basic.forever(function () {
     if (MIDIRESTART) {
         part = -1
         tone = 0
-        start = control.millis()
+        tm_start = control.millis()
         MIDIRESTART = false
     }
 
     tm = control.millis();
-    if (tm >= start + BEAT * songnotes[MIDINOTE][SONG_START]) {
+    if (tm >= tm_start + BEAT * songnotes[MIDINOTE][SONG_START]) {
         if (songnotes[MIDINOTE][SONG_MSG])
             radio.sendNumber(songnotes[MIDINOTE][SONG_MSG])
         tone = TONE;
@@ -96,7 +97,7 @@ basic.forever(function () {
                 noteOff(midinotes[part][i]);
             midinotes[part][i] = songnotes[MIDINOTE][i];
         }
-        midinotes[part][NOTE_OFF] = start +
+        midinotes[part][NOTE_OFF] = tm_start +
             BEAT * (songnotes[MIDINOTE][SONG_START] + songnotes[MIDINOTE][SONG_DURA]);
         for (let i = CHORD_ROOT; i < CHORD_MAX; i++)
             if (midinotes[part][i] >= 0 && midinotes[part][i] < NOTE_PAUSE) {
@@ -132,9 +133,9 @@ basic.forever(function () {
             MIDIRESTART = true;
             MIDINOTE = 0
             if (MIDIREPEAT) {
-                CMidiController.pause(true)
+                CMidiController.stop()
                 basic.pause(500)
-                CMidiController.pause(false)
+                CMidiController.start()
             }
             else
                 CMidiController.stop()
@@ -158,6 +159,7 @@ namespace CMidiController {
 
     export function pause(status: boolean) {
         if (status) {
+            tm_pause = control.millis()
             MIDIPLAY = false
             basic.showLeds(`
                         # # . # #
@@ -175,6 +177,7 @@ namespace CMidiController {
                         . # # # .
                         . # # . .
                         `)
+            tm_start += control.millis() - tm_pause
             MIDIPLAY = true
         }
     }
