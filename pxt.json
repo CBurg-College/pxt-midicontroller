@@ -4,7 +4,8 @@
     "dependencies": {
         "core": "*",
         "radio": "*",
-        "microphone": "*"
+        "microphone": "*",
+        "pxt-general": "github:CBurg-College/pxt-general#a07337d4139187576bff9c572778decb571919cb"
     },
     "files": [
         "main.blocks",
