@@ -19,7 +19,7 @@ met de 'B'-knop.
 ## De audioclip afspelen
 
 Behalve met de 'A'-knop van de midi-controller-microbit, kan er ook
-op afstand worden afgespeeld. De MakeCode-extensie **pxt-mide** biedt
+op afstand worden afgespeeld. De MakeCode-extensie **pxt-midi** biedt
 hier de ondersteuning voor. Je kunt er bovendien het volume mee instellen,
 het tempo aanpassen, instrumenten kiezen en de audioclip transponeren.
 Dit is tijdens het afspelen mogelijk. Door de **pxt-midi**-extensie
