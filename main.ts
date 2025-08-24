@@ -92,7 +92,7 @@ basic.forever(function () {
         if (songnotes[MIDINOTE][SONG_MSG])
             radio.sendNumber(songnotes[MIDINOTE][SONG_MSG])
         tone = TONE;
-        part = songnotes[MIDINOTE][SONG_PART];
+        part = songnotes[MIDINOTE][SONG_PART] - 1;
         for (let i = CHORD_ROOT; i < CHORD_MAX; i++) {
             if (midinotes[part][i] >= 0 && midinotes[part][i] < NOTE_PAUSE)
                 noteOff(midinotes[part][i]);
