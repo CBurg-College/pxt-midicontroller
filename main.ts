@@ -1,6 +1,6 @@
 serial.redirect(SerialPin.P14, SerialPin.P13, 31250)
 
-let BEAT = 6        // 2.6 * 192 = 499 msec
+let TEMPO = 1.0     // normal tempo * 1
 let TONE = 0        // midi notes up(+) or down(-)
 
 const SONG_PART = 0
@@ -88,7 +88,7 @@ basic.forever(function () {
     }
 
     tm = control.millis();
-    if (tm >= tm_start + BEAT * songnotes[MIDINOTE][SONG_START]) {
+    if (tm >= tm_start + TEMPO * songnotes[MIDINOTE][SONG_START]) {
         if (songnotes[MIDINOTE][SONG_MSG])
             radio.sendNumber(songnotes[MIDINOTE][SONG_MSG])
         tone = TONE;
@@ -99,7 +99,7 @@ basic.forever(function () {
             midinotes[part][i] = songnotes[MIDINOTE][i];
         }
         midinotes[part][NOTE_OFF] = tm_start +
-            BEAT * (songnotes[MIDINOTE][SONG_START] + songnotes[MIDINOTE][SONG_DURA]);
+            TEMPO * (songnotes[MIDINOTE][SONG_START] + songnotes[MIDINOTE][SONG_DURA]);
         for (let i = CHORD_ROOT; i < CHORD_MAX; i++)
             if (midinotes[part][i] >= 0 && midinotes[part][i] < NOTE_PAUSE) {
                 midinotes[part][i] = midinotes[part][i] + TONE;
@@ -215,12 +215,9 @@ namespace CMidiController {
         partvolume[partiture - 1] = volume;
     }
 
-    // the length of a whole note
-    // a whole note has value 192
-    // a quarter note has value 48, etc.
-    // the duration of a beat is measured in msec
-    export function duration(msec: number) {
-        BEAT = msec / 192
+    // tempo moderation in percentage
+    export function tempo(perc: number) {
+        TEMPO = perc / 100
     }
 
     // transposing is performed by tone distances
@@ -308,5 +305,5 @@ radio.onReceivedNumber(function (cmd: number) {
     else
     if (cmd < 3000) CMidiController.setVolume(5, cmd - 2800)
     else
-        CMidiController.duration(cmd - 3000)
+        CMidiController.tempo(cmd - 3000)
 })
