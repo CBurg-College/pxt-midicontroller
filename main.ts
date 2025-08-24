@@ -217,6 +217,8 @@ namespace CMidiController {
 
     // tempo moderation in percentage
     export function tempo(perc: number) {
+        if (perc > 200) return
+        perc = 200 - perc
         TEMPO = perc / 100
     }
 
