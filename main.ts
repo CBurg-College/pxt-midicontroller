@@ -102,12 +102,12 @@ basic.forever(function () {
         for (let i = CHORD_ROOT; i < CHORD_MAX; i++)
             if (midinotes[part][i] >= 0 && midinotes[part][i] < NOTE_PAUSE) {
                 midinotes[part][i] = midinotes[part][i] + TONE;
+basic.showNumber(partinstrument[part])
                 if (partinstrument[part] < 0)
                     percussionOn(-partinstrument[part], partvolume[part]);
-                else {
+                else
                     instrument(partinstrument[part]);
-                    noteOn(midinotes[part][i], partvolume[part]);
-                }
+                noteOn(midinotes[part][i], partvolume[part]);
             }
         MIDINOTE += 1;
         if (SONGNOTES[MIDINOTE][SONG_PART] < 0) {
