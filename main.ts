@@ -3,10 +3,11 @@ serial.redirect(SerialPin.P14, SerialPin.P13, 31250)
 let TEMPO = 1.0     // normal tempo * 1
 let TONE = 0        // midi notes up(+) or down(-)
 
+let CURMEASURE = 0
+
 const SONG_PART = 0
 const SONG_START = 1
 const SONG_DURA = 2
-const SONG_MSG = 9
 const NOTE_OFF = 0
 const CHORD_ROOT = 3
 const CHORD_MAX = 9
@@ -20,11 +21,11 @@ let MIDINOTE = 0
 
 let midinotes =
     [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // [0] time noteOff + [3..8] chord notes partiture 1
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // [0] time noteOff + [3..8] chord notes partiture 2
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // [0] time noteOff + [3..8] chord notes partiture 3
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // [0] time noteOff + [3..8] chord notes partiture 4
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // [0] time noteOff + [3..8] chord notes partiture 5
+        [0, 0, 0, 0, 0, 0, 0, 0, 0], // [0] time noteOff + [3..8] chord notes partiture 1
+        [0, 0, 0, 0, 0, 0, 0, 0, 0], // [0] time noteOff + [3..8] chord notes partiture 2
+        [0, 0, 0, 0, 0, 0, 0, 0, 0], // [0] time noteOff + [3..8] chord notes partiture 3
+        [0, 0, 0, 0, 0, 0, 0, 0, 0], // [0] time noteOff + [3..8] chord notes partiture 4
+        [0, 0, 0, 0, 0, 0, 0, 0, 0], // [0] time noteOff + [3..8] chord notes partiture 5
     ]
 
 let partinstrument = [0, 0, 0, 0, 0]
@@ -88,18 +89,16 @@ basic.forever(function () {
     }
 
     tm = control.millis();
-    if (tm >= tm_start + TEMPO * songnotes[MIDINOTE][SONG_START]) {
-        if (songnotes[MIDINOTE][SONG_MSG])
-            radio.sendNumber(songnotes[MIDINOTE][SONG_MSG])
+    if (tm >= tm_start + TEMPO * SONGNOTES[MIDINOTE][SONG_START]) {
         tone = TONE;
-        part = songnotes[MIDINOTE][SONG_PART] - 1;
+        part = SONGNOTES[MIDINOTE][SONG_PART] - 1;
         for (let i = CHORD_ROOT; i < CHORD_MAX; i++) {
             if (midinotes[part][i] >= 0 && midinotes[part][i] < NOTE_PAUSE)
                 noteOff(midinotes[part][i]);
-            midinotes[part][i] = songnotes[MIDINOTE][i];
+            midinotes[part][i] = SONGNOTES[MIDINOTE][i];
         }
         midinotes[part][NOTE_OFF] = tm_start +
-            TEMPO * (songnotes[MIDINOTE][SONG_START] + songnotes[MIDINOTE][SONG_DURA]);
+            TEMPO * (SONGNOTES[MIDINOTE][SONG_START] + SONGNOTES[MIDINOTE][SONG_DURA]);
         for (let i = CHORD_ROOT; i < CHORD_MAX; i++)
             if (midinotes[part][i] >= 0 && midinotes[part][i] < NOTE_PAUSE) {
                 midinotes[part][i] = midinotes[part][i] + TONE;
@@ -111,7 +110,7 @@ basic.forever(function () {
                 }
             }
         MIDINOTE += 1;
-        if (songnotes[MIDINOTE][SONG_PART] < 0) {
+        if (SONGNOTES[MIDINOTE][SONG_PART] < 0) {
 
             // let MIDINOTE notes finish
             let cnt = 0;
@@ -144,7 +143,142 @@ basic.forever(function () {
     }
 })
 
+enum Instrument {
+    //% block="piano"
+    //% block.loc.nl="piano"
+    Piano = 0,
+    //% block="synthesizer"
+    //% block.loc.nl="synthesizer"
+    Synthesizer = 50,
+    //% block="organ"
+    //% block.loc.nl="orgel"
+    Organ = 19,
+    //% block="guitar"
+    //% block.loc.nl="gitaar"
+    Guitar = 25,
+    //% block="electric guitar"
+    //% block.loc.nl="electrische gitaar"
+    ElGuitar = 26,
+    //% block="banjo"
+    //% block.loc.nl="banjo"
+    Banjo = 105,
+    //% block="harp"
+    //% block.loc.nl="harp"
+    Harp = 46,
+    //% block="violin"
+    //% block.loc.nl="viool"
+    Violin = 40,
+    //% block="cello"
+    //% block.loc.nl="cello"
+    Cello = 42,
+    //% block="oboe"
+    //% block.loc.nl="hobo"
+    Oboe = 68,
+    //% block="clarinet"
+    //% block.loc.nl="klarinet"
+    Clarinet = 71,
+    //% block="trumpet"
+    //% block.loc.nl="trompet"
+    Trumpet = 56,
+    //% block="trombone"
+    //% block.loc.nl="trombone"
+    Trombone = 57,
+    //% block="horn"
+    //% block.loc.nl="hoorn"
+    Horn = 60,
+    //% block="sopran saxophone"
+    //% block.loc.nl="sopraan saxofoon"
+    SoprSax = 64,
+    //% block="alto saxophone"
+    //% block.loc.nl="alt saxofoon"
+    AltSax = 65,
+    //% block="tenor saxophone"
+    //% block.loc.nl="tenor saxofoon"
+    TenSax = 66,
+    //% block="piccoo"
+    //% block.loc.nl="piccolo"
+    Piccolo = 72,
+    //% block="flute"
+    //% block.loc.nl="fluit"
+    Flute = 73,
+    //% block="panflute"
+    //% block.loc.nl="panfluit"
+    PanFlute = 75,
+    //% block="wistle"
+    //% block.loc.nl="mond fluiten"
+    Whistle = 78,
+    //% block="bag pipe"
+    //% block.loc.nl="doedelzak"
+    Bagpipe = 109,
+    //% block="xylophone"
+    //% block.loc.nl="xylofoon"
+    Xylophone = 13,
+    //% block="tubular bells"
+    //% block.loc.nl="buis-klokkenspel"
+    TubBells = 14,
+    //% block="Chimes"
+    //% block.loc.nl="Klokkenspel"
+    Chimes = 9,
+    //% block="marimba"
+    //% block.loc.nl="marimba"
+    Marimba = 12,
+    //% block="steel drum"
+    //% block.loc.nl="steeldrum"
+    SteelDrum = 114,
+    //% block="drum"
+    //% block.loc.nl="kleine trom"
+    Drum = -38,
+    //% block="bass drum"
+    //% block.loc.nl="grote trom"
+    BassDrum = -36,
+    //% block=""
+    //% block.loc.nl=""
+    HiTom = -50,
+    //% block=""
+    //% block.loc.nl=""
+    LoTom = -45,
+    //% block="cymbal"
+    //% block.loc.nl="bekken"
+    Cymbal = -49,
+    //% block="tambourine"
+    //% block.loc.nl="tamboerijn"
+    Tambourine = -54,
+    //% block="cowbell"
+    //% block.loc.nl="koebel"
+    CowBell = -56,
+    //% block="hand clap"
+    //% block.loc.nl="klap in de handen"
+    HandClap = -39,
+    //% block="high bongo"
+    //% block.loc.nl="hoge bongo"
+    HiBongo = -60,
+    //% block="low bongo"
+    //% block.loc.nl="lage bongo"
+    LoBongo = -61,
+    //% block="triangle"
+    //% block.loc.nl="triangel"
+    Triangle = -81,
+}
+
+//% color="#00CC00" icon="\uf1f9"
+//% block="Midi song"
+//% block.loc.nl="Midi song"
 namespace CMidiController {
+
+    //% block="current measure"
+    //% block.loc.nl="huidige maat"
+    export function currentMeasure( measure: number) : number {
+        let cur = Math.floor((control.millis() - tm_start) / MEASURE)
+        if (CURMEASURE != cur) {
+            CURMEASURE = cur
+            radio.sendNumber(CURMEASURE)
+            return CURMEASURE
+        }
+        return -1
+    }
+
+    //% block="start"
+    //% block.loc.nl="start"
     export function start() {
         basic.showLeds(`
                         . # # . .
@@ -157,40 +291,49 @@ namespace CMidiController {
         MIDINOTE = 0
         MIDIPLAY = true
         MIDIRESTART = true
+        CURMEASURE = -1
     }
 
-    export function pause() {
-        if (tm_pause) {
-            basic.showLeds(`
-                        . # # . .
-                        . # # # .
-                        . # # # #
-                        . # # # .
-                        . # # . .
-                        `)
-            tm_start += control.millis() - tm_pause
-            tm_pause = 0;
-            MIDIPLAY = true
-        }
-        else {
-            if (MIDIPLAY) {
-                tm_pause = control.millis()
-                MIDIPLAY = false
+    //% block="set pause %status"
+    //% block.loc.nl="zet pauze %status"
+    export function pause(status: boolean) {
+        if ((tm_pause != 0) != status) {
+            if (tm_pause) {
                 basic.showLeds(`
-                            # # . # #
-                            # # . # #
-                            # # . # #
-                            # # . # #
-                            # # . # #
+                            . # # . .
+                            . # # # .
+                            . # # # #
+                            . # # # .
+                            . # # . .
                             `)
+                tm_start += control.millis() - tm_pause
+                tm_pause = 0;
+                MIDIPLAY = true
+            }
+            else {
+                if (MIDIPLAY) {
+                    tm_pause = control.millis()
+                    MIDIPLAY = false
+                    basic.showLeds(`
+                                # # . # #
+                                # # . # #
+                                # # . # #
+                                # # . # #
+                                # # . # #
+                                `)
+                }
             }
         }
     }
 
+    //% block="set repeat %status"
+    //% block.loc.nl="zet repeat %status"
     export function repeat(status: boolean) {
         MIDIREPEAT = status
     }
 
+    //% block="stop the song"
+    //% block.loc.nl="stop de song"
     export function stop() {
         tm_pause = 0
         MIDIPLAY = false
@@ -203,27 +346,37 @@ namespace CMidiController {
                         `)
     }
 
-    export function setInstrument(partiture: number, instrument: number) {
+    //% block="choose %instrument or pariture %partiture"
+    //% block.loc.nl="Kies %instrument voor partituur %partiture"
+    //% partiture.min=1 partiture.max=5
+    export function setInstrument(instrument: Instrument, partiture: number) {
         if (partiture < 1 || partiture > 5) return;
         if (instrument < -127 || instrument > 127) return
         partinstrument[partiture - 1] = instrument;
     }
 
+    //% block="set volume of pariture %partiture to %volume %%"
+    //% block.loc.nl="Stel het volume van partituur %partiture in op %volume %%"
+    //% partiture.min=1 partiture.max=5
+    //% volume.min=0 volume.max=100
     export function setVolume(partiture: number, volume: number) {
         if (partiture < 1 || partiture > 5) return;
         if (volume > 127) return
         partvolume[partiture - 1] = volume;
     }
 
-    // tempo moderation in percentage
+    //% block="change tempo to %perc %%"
+    //% block.loc.nl="wijzig het tempo in %perc %%"
+    //% perc.min=0 perc.max=100
     export function tempo(perc: number) {
         if (perc > 200) return
         perc = 200 - perc
         TEMPO = perc / 100
     }
 
-    // transposing is performed by tone distances
-    // negative values lower the tone
+    //% block="transpose the song with %distance note distance"
+    //% block.loc.nl="transponeer the song met %distance" noot-afstand"
+    //% distance.min=-127 distance.max=127
     export function transpose(distance: number) {
         TONE = Math.floor(distance);
     }
@@ -252,9 +405,10 @@ input.onButtonPressed(Button.B, function () {
 radio.onReceivedNumber(function (cmd: number) {
     // 0: stop playing
     // 1: start playing
-    // 2: pause/resume playing
-    // 3: repeat on
-    // 4: repeat off
+    // 2: pause on
+    // 3: pause off
+    // 4: repeat on
+    // 5: repeat off
 
     // 100-500: transposing = value - 300
 
@@ -276,7 +430,9 @@ radio.onReceivedNumber(function (cmd: number) {
     else
     if (cmd == 1) CMidiController.start()
     else
-    if (cmd == 2) CMidiController.pause()
+    if (cmd == 2) CMidiController.pause(true)
+    else
+    if (cmd == 2) CMidiController.pause(false)
     else
     if (cmd == 3) CMidiController.repeat(true)
     else
