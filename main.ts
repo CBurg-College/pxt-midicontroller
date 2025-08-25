@@ -266,7 +266,7 @@ namespace CMidiController {
 
     //% block="current measure"
     //% block.loc.nl="huidige maat"
-    export function currentMeasure( measure: number) : number {
+    export function currentMeasure() : number {
         let cur = Math.floor((control.millis() - tm_start) / MEASURE)
         if (CURMEASURE != cur) {
             CURMEASURE = cur
