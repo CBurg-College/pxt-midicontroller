@@ -89,6 +89,7 @@ basic.forever(function () {
     }
 
     tm = control.millis();
+
     if (tm >= tm_start + TEMPO * SONGNOTES[MIDINOTE][SONG_START]) {
         tone = TONE;
         part = SONGNOTES[MIDINOTE][SONG_PART] - 1;
@@ -109,8 +110,8 @@ basic.forever(function () {
                 noteOn(midinotes[part][i], partvolume[part]);
             }
         MIDINOTE += 1;
-        if (SONGNOTES[MIDINOTE][SONG_PART] < 0) {
 
+        if (SONGNOTES[MIDINOTE][SONG_PART] < 0) {
             // let MIDINOTE notes finish
             let cnt = 0;
             while (MIDIPLAY && (cnt < 5)) {
@@ -139,6 +140,12 @@ basic.forever(function () {
             else
                 CMidiController.stop()
         }
+    }
+
+    let cur = Math.floor((tm - tm_start) / MEASURE)
+    if (CURMEASURE != cur) {
+        CURMEASURE = cur
+        radio.sendNumber(CURMEASURE)
     }
 })
 
@@ -267,13 +274,7 @@ namespace CMidiController {
     //% block="current measure"
     //% block.loc.nl="huidige maat"
     export function currentMeasure() : number {
-        let cur = Math.floor((control.millis() - tm_start) / MEASURE)
-        if (CURMEASURE != cur) {
-            CURMEASURE = cur
-            radio.sendNumber(CURMEASURE)
-            return CURMEASURE
-        }
-        return -1
+        return CURMEASURE
     }
 
     //% block="start"
