@@ -142,7 +142,7 @@ basic.forever(function () {
         }
     }
 
-    let cur = Math.floor((tm - tm_start) / MEASURE)
+    let cur = Math.floor((tm - tm_start) / MEASURE) + 1
     if (CURMEASURE != cur) {
         CURMEASURE = cur
         radio.sendNumber(-CURMEASURE)
