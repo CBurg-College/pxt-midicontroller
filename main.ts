@@ -3,6 +3,8 @@ serial.redirect(SerialPin.P14, SerialPin.P13, 31250)
 let TEMPO = 1.0     // normal tempo * 1
 let TONE = 0        // midi notes up(+) or down(-)
 
+let SONGNOTES: number [][]
+let MEASURE: number
 let CURMEASURE = 0
 
 const SONG_PART = 0
